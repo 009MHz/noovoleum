@@ -30,7 +30,7 @@ class BasePage:
             raise
 
     @allure.step("Find element by locator")
-    def find_element(self, locator: tuple, timeout: int = None) -> Any:
+    def _find(self, locator: tuple, timeout: int = None) -> Any:
         """Find element with explicit wait"""
         wait_time = timeout or Config.EXPLICIT_WAIT
         try:
@@ -58,7 +58,7 @@ class BasePage:
             return []
 
     @allure.step("Click element")
-    def click_element(self, locator, timeout: int = None) -> None:
+    def _click(self, locator, timeout: int = None) -> None:
         """Click element after ensuring it's clickable"""
         wait_time = timeout or Config.EXPLICIT_WAIT
         try:
@@ -75,7 +75,7 @@ class BasePage:
     def enter_text(self, locator: tuple, text: str, clear_first: bool = True) -> None:
         """Enter text into input field"""
         try:
-            element = self.find_element(locator)
+            element = self._find(locator)
             if clear_first:
                 element.clear()
             element.send_keys(text)
@@ -88,7 +88,7 @@ class BasePage:
     def get_text(self, locator: tuple) -> str:
         """Get text from element"""
         try:
-            element = self.find_element(locator)
+            element = self._find(locator)
             text = element.text
             logger.debug(f"Got text '{text}' from element: {locator}")
             return text
@@ -100,7 +100,7 @@ class BasePage:
     def get_attribute(self, locator: tuple, attribute: str) -> str:
         """Get attribute value from element"""
         try:
-            element = self.find_element(locator)
+            element = self._find(locator)
             value = element.get_attribute(attribute)
             logger.debug(f"Got attribute '{attribute}' = '{value}' from element: {locator}")
             return value
@@ -140,7 +140,7 @@ class BasePage:
     def scroll_to_element(self, locator: tuple) -> None:
         """Scroll to element"""
         try:
-            element = self.find_element(locator)
+            element = self._find(locator)
             self.driver.execute_script("arguments[0].scrollIntoView(true);", element)
             logger.debug(f"Scrolled to element: {locator}")
         except Exception as e:
@@ -201,7 +201,7 @@ class BasePage:
     def hover_over_element(self, locator: tuple) -> None:
         """Hover over element"""
         try:
-            element = self.find_element(locator)
+            element = self._find(locator)
             self.actions.move_to_element(element).perform()
             logger.debug(f"Hovered over element: {locator}")
         except Exception as e:
