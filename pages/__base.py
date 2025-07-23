@@ -182,3 +182,59 @@ class BasePage:
             logger.debug("Page loaded completely")
         except TimeoutException:
             logger.warning(f"Page load timeout after {wait_time} seconds")
+
+    @allure.step("Wait for element to be clickable")
+    def wait_for_clickable(self, locator: tuple, timeout: int = None) -> Any:
+        """Wait for element to be clickable and return it"""
+        wait_time = timeout or Config.EXPLICIT_WAIT
+        try:
+            element = WebDriverWait(self.driver, wait_time).until(
+                EC.element_to_be_clickable(locator)
+            )
+            logger.debug(f"Element is clickable: {locator}")
+            return element
+        except TimeoutException:
+            logger.error(f"Element not clickable within {wait_time} seconds: {locator}")
+            raise
+
+    @allure.step("Hover over element")
+    def hover_over_element(self, locator: tuple) -> None:
+        """Hover over element"""
+        try:
+            element = self.find_element(locator)
+            self.actions.move_to_element(element).perform()
+            logger.debug(f"Hovered over element: {locator}")
+        except Exception as e:
+            logger.error(f"Failed to hover over element {locator}: {str(e)}")
+            raise
+
+    @allure.step("Switch to new window/tab")
+    def switch_to_new_window(self) -> None:
+        """Switch to the most recently opened window/tab"""
+        try:
+            self.driver.switch_to.window(self.driver.window_handles[-1])
+            logger.info("Switched to new window/tab")
+        except Exception as e:
+            logger.error(f"Failed to switch to new window: {str(e)}")
+            raise
+
+    @allure.step("Switch to main window")
+    def switch_to_main_window(self) -> None:
+        """Switch to the main (first) window"""
+        try:
+            self.driver.switch_to.window(self.driver.window_handles[0])
+            logger.info("Switched to main window")
+        except Exception as e:
+            logger.error(f"Failed to switch to main window: {str(e)}")
+            raise
+
+    @allure.step("Execute JavaScript")
+    def execute_script(self, script: str, *args) -> Any:
+        """Execute JavaScript and return the result"""
+        try:
+            result = self.driver.execute_script(script, *args)
+            logger.debug(f"Executed JavaScript: {script}")
+            return result
+        except Exception as e:
+            logger.error(f"Failed to execute JavaScript '{script}': {str(e)}")
+            raise
