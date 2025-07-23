@@ -58,7 +58,7 @@ class BasePage:
             return []
 
     @allure.step("Click element")
-    def click_element(self, locator: tuple, timeout: int = None) -> None:
+    def click_element(self, locator, timeout: int = None) -> None:
         """Click element after ensuring it's clickable"""
         wait_time = timeout or Config.EXPLICIT_WAIT
         try:
